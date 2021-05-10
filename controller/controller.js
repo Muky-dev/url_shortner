@@ -22,5 +22,12 @@ export async function postUrl(req, res) {
 }
 
 export async function getUrl(req, res) {
-    
+    const shortUrl = req.params.short_url;
+
+    try {
+        const url = await Url.findOne({ short_url: shortUrl });
+        res.redirect(url.original_url);
+    } catch (error) {
+        res.status(500).json({ message: "Inexistent URL"});
+    }
 }
