@@ -1,14 +1,16 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const urlSchema = new mongoose.Schema(
     {
     short_url: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     original_url: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     }
 },
 {
