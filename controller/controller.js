@@ -6,12 +6,11 @@ import uniqueHash from './hasher.js'
 export async function postUrl(req, res) {
     const url = req.body.url;
     const hashed = uniqueHash(url.hashCode());
-    const test_reg = /^http(s?):\/\/(www\.\w+|\w+)\.\w{1,3}/i
-
-    if (!test_reg.test(url)) {
-        res.status(400).json({ error: 'invalid url' });
-    }
-    else {
+    //const test_reg = /^http(s?):\/\/(www\.\w+|\w+)\.\w{1,3}/i
+    const replace_reg = /^http(s?):\/\//i
+    const url_replaced = url.replace(replace_reg, '');
+    try {
+        const ipAddress = await lookup(url_replaced);
         const modeled = {
             original_url: url,
             short_url: hashed
@@ -26,7 +25,20 @@ export async function postUrl(req, res) {
                 res.status(500).json(error);
             }
         }
+    } catch {
+        res.status(500).json({ error: 'invalid url' });
     }
+}
+async function lookup(hostname) {
+    return new Promise((resolve, reject) => {
+        dns.lookup(hostname, (err, address, family) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(address);
+            }
+        });
+    });
 }
 
 export async function getUrl(req, res) {
