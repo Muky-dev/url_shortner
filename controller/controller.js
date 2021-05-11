@@ -6,7 +6,7 @@ import uniqueHash from './hasher.js'
 export async function postUrl(req, res) {
     const url = req.body.url;
     const hashed = uniqueHash(url.hashCode());
-    const test_reg = /^https?:\/\/www/i
+    const test_reg = /^https:\/\/(www\.\w+|\w+)\.\w{1,3}/i
 
     if (!test_reg.test(url)) {
         res.status(400).json({ error: 'invalid url' });
