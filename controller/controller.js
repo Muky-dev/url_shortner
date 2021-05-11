@@ -6,10 +6,10 @@ import uniqueHash from './hasher.js'
 export async function postUrl(req, res) {
     const url = req.body.url;
     const hashed = uniqueHash(url.hashCode());
-    const test_reg = /^http(s?):\/\/(www\.\w+|\w+)\.\w{1,3}/i
+    //const test_reg = /^http(s?):\/\/(www\.\w+|\w+)\.\w{1,5}/i
     const replace_reg = /^http(s?):\/\//i
     const url_replaced = url.replace(replace_reg, '');
-    if (!test_reg.test(url)) {
+    if (!replace_reg.test(url)) {
         res.status(500).json({ error: 'invalid url' });
     } else {
         try {
@@ -29,7 +29,7 @@ export async function postUrl(req, res) {
                 }
             }
         } catch {
-            res.status(500).json({ error: 'invalid url' });
+            res.status(500).json({"error":"invalid url" });
         }
     }
 }
