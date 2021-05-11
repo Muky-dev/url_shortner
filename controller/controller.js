@@ -6,27 +6,31 @@ import uniqueHash from './hasher.js'
 export async function postUrl(req, res) {
     const url = req.body.url;
     const hashed = uniqueHash(url.hashCode());
-    //const test_reg = /^http(s?):\/\/(www\.\w+|\w+)\.\w{1,3}/i
+    const test_reg = /^http(s?):\/\/(www\.\w+|\w+)\.\w{1,3}/i
     const replace_reg = /^http(s?):\/\//i
     const url_replaced = url.replace(replace_reg, '');
-    try {
-        const ipAddress = await lookup(url_replaced);
-        const modeled = {
-            original_url: url,
-            short_url: hashed
-        }
-        try {
-            await new Url(modeled).save();
-            res.status(200).json(modeled);
-        } catch (error) {
-            if (error.code === 11000) {
-                res.status(200).json(modeled);
-            } else {
-                res.status(500).json(error);
-            }
-        }
-    } catch {
+    if (!test_reg.test(url)) {
         res.status(500).json({ error: 'invalid url' });
+    } else {
+        try {
+            const ipAddress = await lookup(url_replaced);
+            const modeled = {
+                original_url: url,
+                short_url: hashed
+            }
+            try {
+                await new Url(modeled).save();
+                res.status(200).json(modeled);
+            } catch (error) {
+                if (error.code === 11000) {
+                    res.status(200).json(modeled);
+                } else {
+                    res.status(500).json(error);
+                }
+            }
+        } catch {
+            res.status(500).json({ error: 'invalid url' });
+        }
     }
 }
 async function lookup(hostname) {
